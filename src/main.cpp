@@ -39,45 +39,40 @@ int main(int argc, char *argv[])
     pcpp::IFileReaderDevice *reader = pcpp::IFileReaderDevice::getReader(filename.c_str());
     if (!reader)
     {
-        printf("Cannot determine reader for file type\n");
+        std::cout << "Cannot determine reader for file type" << std::endl;
         return -1;
     }
     if (!reader->open())
     {
-        printf("Cannot open file for reading\n");
+        std::cout << "Cannot open file for reading" << std::endl;
         return -1;
     }
     else
-        printf("File \"%s\" opened for reading\n", filename.c_str());
+        std::cout << "File " << filename << " opened for reading" << std::endl;
     pcpp::PcapLiveDevice *dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByIp(interfaceAddress.c_str());
     if (!dev)
     {
-        printf("Cannot find interface with IPv4 address of '%s'\n", interfaceAddress.c_str());
+        std::cout << "Cannot find interface with IPv4 address of " << interfaceAddress;
         return -1;
     }
     else
     {
         if (!dev->open())
         {
-            printf("Cannot open device\n");
+            std::cout << "Cannot open device" << std::endl;
             return -1;
         }
-        else
-            printf("Network device initialized\n");
     }
 
     pcpp::RawPacket rawPacket;
     int counter = 0;
     while (reader->getNextPacket(rawPacket))
     {
-        printf("Captured file #%d, size %d >>", ++counter, rawPacket.getFrameLength());
         if (!dev->sendPacket(rawPacket))
         {
-            printf("Couldn't send packet #%d\n", counter);
+            std::cout << "Couldn't send packet #" << counter << std::endl;
             return -1;
         }
-        else
-            printf(" send succeed!\n");
     }
 
     reader->close();
