@@ -8,9 +8,10 @@ namespace opt = boost::program_options;
 int main(int argc, char *argv[])
 {
     opt::options_description desc("All options");
+    std::string interfaceAddress = "";
     std::string filename = "";
 
-    desc.add_options()("input,i", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("help,h", "Show help");
+    desc.add_options()("input,i", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("interface,f", opt::value<std::string>(&interfaceAddress), "Path to pcap/pcapng file")("help,h", "Show help")("devices,d", "Get devices list");
 
     opt::variables_map vm;
 
@@ -24,9 +25,21 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    if (vm.count("devices"))
+    {
+        std::cout << "Avialable devices list:" << std::endl;
+        const std::vector<pcpp::PcapLiveDevice *> devicesList = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDevicesList();
+        for (int i = 0; i < devicesList.size(); i++)
+        {
+            std::cout << "Device #" << i << ", " << devicesList[i]->getName() << ", address " << devicesList[i]->getIPv4Address().toString() << std::endl;
+        }
+        std::cout << "Paste IP address with param --interface" << std::endl;
+    }
+
+    pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDevicesList();
+
     return 0;
 
-    std::string interfaceIPAddr = "192.168.1.74";
     pcpp::IFileReaderDevice *reader = pcpp::IFileReaderDevice::getReader(filename.c_str());
     if (!reader)
     {
@@ -40,10 +53,10 @@ int main(int argc, char *argv[])
     }
     else
         printf("File \"%s\" opened for reading\n", filename.c_str());
-    pcpp::PcapLiveDevice *dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByIp(interfaceIPAddr.c_str());
+    pcpp::PcapLiveDevice *dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByIp(interfaceAddress.c_str());
     if (!dev)
     {
-        printf("Cannot find interface with IPv4 address of '%s'\n", interfaceIPAddr.c_str());
+        printf("Cannot find interface with IPv4 address of '%s'\n", interfaceAddress.c_str());
         return -1;
     }
     else
