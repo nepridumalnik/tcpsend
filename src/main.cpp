@@ -105,7 +105,10 @@ int main(int argc, char *argv[])
             std::cout << "Couldn't send packet #" << counter << std::endl;
             return -1;
         }
+        counter++;
     }
+
+    std::cout << counter << " packets were successfully sent" << std::endl;
 
     reader->close();
     dev->close();
