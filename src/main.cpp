@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     // Setting parameters up
     opt::options_description desc("All options");
-    desc.add_options()("input,f", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("timeout,t", opt::value<unsigned int>(&timeout)->default_value(0), "Timeout between sending packets")("interface,i", opt::value<std::string>(&interfaceAddress), "IP address of interface")("repeat,r", "Repeat sending cycle or not")("devices,d", "Get devices list")("help,h", "Show help");
+    desc.add_options()("input,f", opt::value<std::string>(&filename), "Path to pcap/pcapng file (required value)")("timeout,t", opt::value<unsigned int>(&timeout)->default_value(0), "Timeout between sending packets")("interface,i", opt::value<std::string>(&interfaceAddress), "IP address of interface (required value)")("repeat,r", "Repeat sending cycle or not")("devices,d", "Get devices list")("help,h", "Show help");
 
     // Handling parameters
     try
