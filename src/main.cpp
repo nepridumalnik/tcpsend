@@ -42,13 +42,17 @@ int main(int argc, char *argv[])
         }
 
         // Check for critical parameters
+        if (!vm.count("input") && !vm.count("interface"))
+        {
+            throw "input pcap/pcapng file and interface are both not specified";
+        }
         if (!vm.count("input"))
         {
-            throw "input pcap/pcapng file not specified";
+            throw "input pcap/pcapng file is not specified";
         }
         if (!vm.count("interface"))
         {
-            throw "interface`s IP address not specified";
+            throw "interface`s IP address is not specified";
         }
     }
     catch (char *error)
