@@ -1,0 +1,6 @@
+# Files
+*.pcapng
+
+# Directories
+build
+.vscode
