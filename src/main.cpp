@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
             std::cout << "Device #" << i << ", " << devicesList[i]->getName() << ", address " << devicesList[i]->getIPv4Address().toString() << std::endl;
         }
         std::cout << "Paste IP address with param --interface" << std::endl;
+        return -1;
     }
 
     pcpp::IFileReaderDevice *reader = pcpp::IFileReaderDevice::getReader(filename.c_str());
