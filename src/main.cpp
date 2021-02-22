@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
             throw "interface`s IP address is not specified";
         }
     }
-    catch (char *error)
+    catch (const char *error)
     {
         std::cout << "Error: " << error << std::endl;
         std::cout << "Use --help or -h for help" << std::endl;
