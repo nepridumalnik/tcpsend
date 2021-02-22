@@ -11,6 +11,7 @@ void sendPackets(pcpp::PcapLiveDevice *dev, pcpp::RawPacketVector &packetVec, un
 {
     unsigned int counter = 0;
     unsigned int fail = 0;
+    unsigned int cycle_number = 0;
     const uint32_t mtu = dev->getMtu();
 
     do
@@ -29,6 +30,13 @@ void sendPackets(pcpp::PcapLiveDevice *dev, pcpp::RawPacketVector &packetVec, un
                           << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
         }
+        if (repeat)
+        {
+            std::cout << "Cycle #" << cycle_number << " restarted with " << counter - fail << "/" << counter << " successfully sent packets" << std::endl;
+            counter = 0;
+            fail = 0;
+            cycle_number++;
+        }
     } while (repeat);
 
     std::cout << counter - fail << "/" << counter << " packets were successfully sent" << std::endl;
@@ -45,7 +53,7 @@ int main(int argc, char *argv[])
 
     // Setting parameters up
     opt::options_description desc("All options");
-    desc.add_options()("input,f", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("timeout,t", opt::value<unsigned int>(&timeout), "Timeout between sending packets")("interface,i", opt::value<std::string>(&interfaceAddress), "IP address of interface")("repeat,r", opt::value<bool>(&repeat)("devices,d", "Get devices list")("help,h", "Show help");
+    desc.add_options()("input,f", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("timeout,t", opt::value<unsigned int>(&timeout)->default_value(0), "Timeout between sending packets")("interface,i", opt::value<std::string>(&interfaceAddress), "IP address of interface")("repeat,r", opt::value<bool>(&repeat), "Repeat sending cycle or not")("devices,d", "Get devices list")("help,h", "Show help");
 
     // Handling parameters
     try
