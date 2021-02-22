@@ -7,33 +7,54 @@ namespace opt = boost::program_options;
 
 int main(int argc, char *argv[])
 {
-    opt::options_description desc("All options");
     std::string interfaceAddress = "";
     std::string filename = "";
 
+    // Setting parameters up
+    opt::options_description desc("All options");
     desc.add_options()("input,i", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("interface,f", opt::value<std::string>(&interfaceAddress), "Path to pcap/pcapng file")("devices,d", "Get devices list")("help,h", "Show help");
 
+    // Parsing parameters
     opt::variables_map vm;
-
     opt::store(opt::parse_command_line(argc, argv, desc), vm);
-
     opt::notify(vm);
 
-    if (vm.count("help"))
+    // Handling parameters
+    try
     {
-        std::cout << desc << std::endl;
-        return 0;
-    }
-
-    if (vm.count("devices"))
-    {
-        std::cout << "Avialable devices list:" << std::endl;
-        const std::vector<pcpp::PcapLiveDevice *> devicesList = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDevicesList();
-        for (int i = 0; i < devicesList.size(); i++)
+        // Check for optional parameters
+        if (vm.count("help"))
         {
-            std::cout << "Device #" << i << ", " << devicesList[i]->getName() << ", address " << devicesList[i]->getIPv4Address().toString() << std::endl;
+            std::cout << desc << std::endl;
+            return 0;
         }
-        std::cout << "Paste IP address with param --interface" << std::endl;
+
+        if (vm.count("devices"))
+        {
+            std::cout << "Avialable devices list:" << std::endl;
+            const std::vector<pcpp::PcapLiveDevice *> devicesList = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDevicesList();
+            for (int i = 0; i < devicesList.size(); i++)
+            {
+                std::cout << "Device #" << i << ", " << devicesList[i]->getName() << ", address " << devicesList[i]->getIPv4Address().toString() << std::endl;
+            }
+            std::cout << "Paste IP address with param --interface" << std::endl;
+            return 0;
+        }
+
+        // Check for critical parameters
+        if (!vm.count("input"))
+        {
+            throw "input pcap/pcapng file not specified";
+        }
+        if (!vm.count("interface"))
+        {
+            throw "interface`s IP address not specified";
+        }
+    }
+    catch (char *error)
+    {
+        std::cout << "Error: " << error << std::endl;
+        std::cout << "Use --help or -h for help" << std::endl;
         return -1;
     }
 
@@ -66,7 +87,7 @@ int main(int argc, char *argv[])
     }
 
     pcpp::RawPacket rawPacket;
-    int counter = 0;
+    unsigned int counter = 0;
     while (reader->getNextPacket(rawPacket))
     {
         if (!dev->sendPacket(rawPacket))
