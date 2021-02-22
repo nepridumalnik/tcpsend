@@ -7,6 +7,6 @@ All options:
   -h [ --help ]          Show help
   
   Example: tcpsend -i 192.168.1.74 -i .\captured.pcapng
- # output: 
+# output
   File .\captured1.pcapng opened for reading
   3876 packets were successfully sent
