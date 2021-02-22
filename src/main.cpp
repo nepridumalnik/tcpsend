@@ -2,6 +2,8 @@
 #include "PcapLiveDeviceList.h"
 #include "PcapFileDevice.h"
 #include "boost/program_options.hpp"
+#include <chrono>
+#include <thread>
 
 namespace opt = boost::program_options;
 
@@ -9,10 +11,11 @@ int main(int argc, char *argv[])
 {
     std::string interfaceAddress = "";
     std::string filename = "";
+    unsigned int timeout = 0;
 
     // Setting parameters up
     opt::options_description desc("All options");
-    desc.add_options()("input,i", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("interface,f", opt::value<std::string>(&interfaceAddress), "Path to pcap/pcapng file")("devices,d", "Get devices list")("help,h", "Show help");
+    desc.add_options()("input,i", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("timeout,t", opt::value<unsigned int>(&timeout)->default_value(0), "Timeout between sending packets")("interface,f", opt::value<std::string>(&interfaceAddress), "IP address of interface")("devices,d", "Get devices list")("help,h", "Show help");
 
     // Handling parameters
     try
@@ -98,17 +101,26 @@ int main(int argc, char *argv[])
 
     pcpp::RawPacket rawPacket;
     unsigned int counter = 0;
+    unsigned int fail = 0;
+    const uint32_t mtu = dev->getMtu();
     while (reader->getNextPacket(rawPacket))
     {
-        if (!dev->sendPacket(rawPacket))
-        {
-            std::cout << "Couldn't send packet #" << counter << std::endl;
-            return -1;
-        }
         counter++;
+
+        if (rawPacket.getRawDataLen() > mtu || !dev->sendPacket(rawPacket))
+        {
+            fail++;
+            continue;
+        }
+
+        if (timeout > 0)
+            std::cout << "Sending packet #" << counter << ", lenght:"
+                      << rawPacket.getRawDataLen()
+                      << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
     }
 
-    std::cout << counter << " packets were successfully sent" << std::endl;
+    std::cout << counter - fail << "/" << counter << " packets were successfully sent" << std::endl;
 
     reader->close();
     dev->close();
