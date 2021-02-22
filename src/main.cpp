@@ -32,6 +32,8 @@ void sendPackets(pcpp::PcapLiveDevice *dev, pcpp::RawPacketVector &packetVec, un
     } while (false);
 
     std::cout << counter - fail << "/" << counter << " packets were successfully sent" << std::endl;
+    
+    packetVec.clear();
 }
 
 int main(int argc, char *argv[])
