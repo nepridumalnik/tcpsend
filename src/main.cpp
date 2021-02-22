@@ -7,7 +7,7 @@
 
 namespace opt = boost::program_options;
 
-void sendPackets(pcpp::PcapLiveDevice *dev, pcpp::RawPacketVector &packetVec, unsigned int timeout)
+void sendPackets(pcpp::PcapLiveDevice *dev, pcpp::RawPacketVector &packetVec, unsigned int timeout, bool repeat)
 {
     unsigned int counter = 0;
     unsigned int fail = 0;
@@ -29,10 +29,10 @@ void sendPackets(pcpp::PcapLiveDevice *dev, pcpp::RawPacketVector &packetVec, un
                           << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
         }
-    } while (false);
+    } while (repeat);
 
     std::cout << counter - fail << "/" << counter << " packets were successfully sent" << std::endl;
-    
+
     packetVec.clear();
 }
 
@@ -41,10 +41,11 @@ int main(int argc, char *argv[])
     std::string interfaceAddress = "";
     std::string filename = "";
     unsigned int timeout = 0;
+    bool repeat = false;
 
     // Setting parameters up
     opt::options_description desc("All options");
-    desc.add_options()("input,f", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("timeout,t", opt::value<unsigned int>(&timeout)->default_value(0), "Timeout between sending packets")("interface,i", opt::value<std::string>(&interfaceAddress), "IP address of interface")("devices,d", "Get devices list")("help,h", "Show help");
+    desc.add_options()("input,f", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("timeout,t", opt::value<unsigned int>(&timeout), "Timeout between sending packets")("interface,i", opt::value<std::string>(&interfaceAddress), "IP address of interface")("repeat,r", opt::value<bool>(&repeat)("devices,d", "Get devices list")("help,h", "Show help");
 
     // Handling parameters
     try
@@ -133,7 +134,7 @@ int main(int argc, char *argv[])
     reader->getNextPackets(packetVec);
     reader->close();
 
-    sendPackets(dev, packetVec, timeout);
+    sendPackets(dev, packetVec, timeout, repeat);
 
     dev->close();
 
