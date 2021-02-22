@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     std::string interfaceAddress = "";
     std::string filename = "";
 
-    desc.add_options()("input,i", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("interface,f", opt::value<std::string>(&interfaceAddress), "Path to pcap/pcapng file")("help,h", "Show help")("devices,d", "Get devices list");
+    desc.add_options()("input,i", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("interface,f", opt::value<std::string>(&interfaceAddress), "Path to pcap/pcapng file")("devices,d", "Get devices list")("help,h", "Show help");
 
     opt::variables_map vm;
 
@@ -35,10 +35,6 @@ int main(int argc, char *argv[])
         }
         std::cout << "Paste IP address with param --interface" << std::endl;
     }
-
-    pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDevicesList();
-
-    return 0;
 
     pcpp::IFileReaderDevice *reader = pcpp::IFileReaderDevice::getReader(filename.c_str());
     if (!reader)
