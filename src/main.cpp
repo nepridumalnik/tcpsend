@@ -14,14 +14,14 @@ int main(int argc, char *argv[])
     opt::options_description desc("All options");
     desc.add_options()("input,i", opt::value<std::string>(&filename), "Path to pcap/pcapng file")("interface,f", opt::value<std::string>(&interfaceAddress), "Path to pcap/pcapng file")("devices,d", "Get devices list")("help,h", "Show help");
 
-    // Parsing parameters
-    opt::variables_map vm;
-    opt::store(opt::parse_command_line(argc, argv, desc), vm);
-    opt::notify(vm);
-
     // Handling parameters
     try
     {
+        // Parsing parameters
+        opt::variables_map vm;
+        opt::store(opt::parse_command_line(argc, argv, desc), vm);
+        opt::notify(vm);
+
         // Check for optional parameters
         if (vm.count("help"))
         {
@@ -60,6 +60,12 @@ int main(int argc, char *argv[])
         std::cout << "Error: " << error << std::endl;
         std::cout << "Use --help or -h for help" << std::endl;
         return -1;
+    }
+    catch (opt::reading_file::error &error)
+    {
+        std::cout << "Error: " << error.what() << std::endl;
+        std::cout << "Use --help or -h for help" << std::endl;
+        return -2;
     }
 
     pcpp::IFileReaderDevice *reader = pcpp::IFileReaderDevice::getReader(filename.c_str());
