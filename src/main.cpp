@@ -7,6 +7,33 @@
 
 namespace opt = boost::program_options;
 
+void sendPackets(pcpp::PcapLiveDevice *dev, pcpp::RawPacketVector &packetVec, unsigned int timeout)
+{
+    unsigned int counter = 0;
+    unsigned int fail = 0;
+    const uint32_t mtu = dev->getMtu();
+
+    do
+    {
+        for (auto rawPacket : packetVec)
+        {
+            counter++;
+            if (rawPacket->getRawDataLen() > mtu || !dev->sendPacket(*rawPacket))
+            {
+                fail++;
+                continue;
+            }
+            if (timeout > 0)
+                std::cout << "Sending packet #" << counter << ", lenght:"
+                          << rawPacket->getRawDataLen()
+                          << std::endl;
+            std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        }
+    } while (false);
+
+    std::cout << counter - fail << "/" << counter << " packets were successfully sent" << std::endl;
+}
+
 int main(int argc, char *argv[])
 {
     std::string interfaceAddress = "";
@@ -68,7 +95,7 @@ int main(int argc, char *argv[])
     {
         std::cout << "Error: " << error.what() << std::endl;
         std::cout << "Use --help or -h for help" << std::endl;
-        return -2;
+        return -1;
     }
 
     pcpp::IFileReaderDevice *reader = pcpp::IFileReaderDevice::getReader(filename.c_str());
@@ -99,30 +126,13 @@ int main(int argc, char *argv[])
         }
     }
 
-    pcpp::RawPacket rawPacket;
-    unsigned int counter = 0;
-    unsigned int fail = 0;
-    const uint32_t mtu = dev->getMtu();
-    while (reader->getNextPacket(rawPacket))
-    {
-        counter++;
+    pcpp::RawPacketVector packetVec;
 
-        if (rawPacket.getRawDataLen() > mtu || !dev->sendPacket(rawPacket))
-        {
-            fail++;
-            continue;
-        }
-
-        if (timeout > 0)
-            std::cout << "Sending packet #" << counter << ", lenght:"
-                      << rawPacket.getRawDataLen()
-                      << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
-    }
-
-    std::cout << counter - fail << "/" << counter << " packets were successfully sent" << std::endl;
-
+    reader->getNextPackets(packetVec);
     reader->close();
+
+    sendPackets(dev, packetVec, timeout);
+
     dev->close();
 
     return 0;
