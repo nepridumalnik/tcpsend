@@ -2,5 +2,5 @@
 *.pcapng
 
 # Directories
-build
+*build
 .vscode
