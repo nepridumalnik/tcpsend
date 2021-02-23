@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     // Setting parameters up
     opt::options_description desc("All options");
-    desc.add_options()("input,f", opt::value<std::string>(&filename), "Path to pcap/pcapng file (required value)")("interface,i", opt::value<std::string>(&interfaceAddress), "IP address of interface (required value)")("timeout,t", opt::value<unsigned int>(&timeout)->default_value(0), "Timeout between sending packets")("repeat,r", "Repeat sending cycle or not")("devices,d", "Get devices list")("help,h", "Show help");
+    desc.add_options()("input,f", opt::value<std::string>(&filename), "Path to pcap/pcapng file (required value)")("interface,i", opt::value<std::string>(&interfaceAddress), "Name or IPv4 address of interface (required value)")("timeout,t", opt::value<unsigned int>(&timeout)->default_value(0), "Timeout between sending packets")("repeat,r", "Repeat sending cycle or not")("devices,d", "Get devices list")("help,h", "Show help");
 
     // Handling parameters
     try
@@ -126,10 +126,16 @@ int main(int argc, char *argv[])
     }
     else
         std::cout << "File " << filename << " opened for reading" << std::endl;
-    pcpp::PcapLiveDevice *dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByIp(interfaceAddress.c_str());
+
+    pcpp::PcapLiveDevice *dev = dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByName(interfaceAddress.c_str());
     if (!dev)
     {
-        std::cout << "Cannot find interface with IPv4 address of " << interfaceAddress;
+        dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByIp(interfaceAddress.c_str());
+    }
+
+    if (!dev)
+    {
+        std::cout << "Cannot find " << interfaceAddress << " interface";
         return -1;
     }
     else
