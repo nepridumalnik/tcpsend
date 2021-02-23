@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
     else
         std::cout << "File " << filename << " opened for reading" << std::endl;
 
-    pcpp::PcapLiveDevice *dev = dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByName(interfaceAddress.c_str());
+    pcpp::PcapLiveDevice *dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByName(interfaceAddress.c_str());
     if (!dev)
     {
         dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByIp(interfaceAddress.c_str());
