@@ -1,11 +1,6 @@
 from conans import ConanFile, CMake
 
 
-CONFIGURE_OPTIONS = (
-    "program_options"
-)
-
-
 class TCPSend(ConanFile):
     name = "tcpsend"
     version = "1.0.5"
@@ -22,4 +17,3 @@ class TCPSend(ConanFile):
 
     def package(self):
         self.copy("*", src="bin", dst="../../package")
-
