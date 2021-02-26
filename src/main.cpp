@@ -1,8 +1,9 @@
 #include <iostream>
-#include "PcapLiveDeviceList.h"
-#include "PcapFileDevice.h"
-#include "PlatformSpecificUtils.h"
-#include "boost/program_options.hpp"
+#include <PcapPlusPlusVersion.h>
+#include <PcapLiveDeviceList.h>
+#include <PcapFileDevice.h>
+#include <PlatformSpecificUtils.h>
+#include <boost/program_options.hpp>
 
 namespace opt = boost::program_options;
 
@@ -27,7 +28,7 @@ void sendPackets(pcpp::PcapLiveDevice *dev, pcpp::RawPacketVector &packetVec, un
                 std::cout << "Sending packet #" << counter << ", lenght:"
                           << rawPacket->getRawDataLen()
                           << std::endl;
-            PCAP_SLEEP(timeout/1000);
+            PCAP_SLEEP(timeout / 1000);
         }
         if (repeat)
         {
@@ -126,12 +127,7 @@ int main(int argc, char *argv[])
     else
         std::cout << "File " << filename << " opened for reading" << std::endl;
 
-    pcpp::PcapLiveDevice *dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByName(interfaceAddress.c_str());
-    if (!dev)
-    {
-        dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByIp(interfaceAddress.c_str());
-    }
-
+    pcpp::PcapLiveDevice *dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByIp(interfaceAddress.c_str());
     if (!dev)
     {
         std::cout << "Cannot find " << interfaceAddress << " interface";
