@@ -1,0 +1,5 @@
+For configuring cmake project:
+conan install . --install-folder build
+
+For building project:
+conan build . --build-folder build
