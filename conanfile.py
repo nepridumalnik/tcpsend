@@ -7,6 +7,9 @@ CONFIGURE_OPTIONS = (
 
 
 class TCPSend(ConanFile):
+    name = "tcpsend"
+    version = "1.0.5"
+    package_folder = "../../package"
     settings = "os", "compiler", "build_type", "arch"
     requires = "boost/1.72.0", "pcapplusplus/20.08@bincrafters/stable"
     generators = "cmake"
@@ -17,3 +20,7 @@ class TCPSend(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
+
+    def package(self):
+        self.copy("*", src="bin", dst=self.package_folder)
+

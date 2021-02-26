@@ -3,3 +3,6 @@ conan install . --install-folder build
 
 For building project:
 conan build . --build-folder build
+
+For packaging:
+conan package . --build-folder build
