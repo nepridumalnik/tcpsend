@@ -2,7 +2,8 @@
 #include <PcapPlusPlusVersion.h>
 #include <PcapLiveDeviceList.h>
 #include <PcapFileDevice.h>
-#include <PlatformSpecificUtils.h>
+#include <chrono>
+#include <thread>
 #include <boost/program_options.hpp>
 
 namespace opt = boost::program_options;
@@ -28,7 +29,7 @@ void sendPackets(pcpp::PcapLiveDevice *dev, pcpp::RawPacketVector &packetVec, un
                 std::cout << "Sending packet #" << counter << ", lenght:"
                           << rawPacket->getRawDataLen()
                           << std::endl;
-            PCAP_SLEEP(timeout / 1000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
         }
         if (repeat)
         {
